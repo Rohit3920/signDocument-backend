@@ -16,6 +16,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",
     "mongoose": "^8.15.1",
+    "multer": "^2.0.1",
+    "path": "^0.12.7",
     "pdf-lib": "^1.17.1"
   }
 }
