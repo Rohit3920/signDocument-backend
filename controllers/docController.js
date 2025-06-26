@@ -1,45 +1,59 @@
 const Document = require('../models/docModel');
+const path = require('path');
+const fs = require('fs');
 
-const uploadPdf = async (req, res) => {
+exports.uploadDocument = async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    console.log(req.user)
+
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No PDF file uploaded. Please select a .pdf file.' });
-        }
-
-        const { originalname, filename, path: tempFilePath, mimetype, size } = req.file;
-
-        const filePathForDb = `uploads/${filename}`;
-
         const newDocument = new Document({
-            fileName: originalname,
-            filePath: filePathForDb,
-            mimetype: mimetype,
-            size: size,
+            userId: req.user.id,
+            fileName: req.file.originalname,
+            filePath: req.file.path,
         });
 
         await newDocument.save();
-
-        res.status(201).json({
-            message: 'PDF file uploaded successfully',
-            document: {
-                id: newDocument._id,
-                fileName: newDocument.fileName,
-                filePath: newDocument.filePath,
-                mimetype: newDocument.mimetype,
-                size: newDocument.size,
-                uploadDate: newDocument.uploadDate
-            },
-        });
+        res.status(201).json({ message: 'Document uploaded successfully', document: newDocument });
     } catch (error) {
-        console.error('Error during file upload:', error);
-
-        if (error.message === 'Only PDF files are allowed!') {
-            return res.status(400).json({ message: 'Invalid file type. ' + error.message });
-        } else if (error.message === 'File too large') {
-            return res.status(400).json({ message: 'File too large. Maximum size is 5 MB.' });
-        }
-        res.status(500).json({ message: 'Server error: Could not upload file.' });
+        console.error('Error uploading document:', error);
+        res.status(500).json({ message: 'Server error during upload' });
     }
 };
 
-module.exports = { uploadPdf };
+exports.getDocuments = async (req, res) => {
+    try {
+        const documents = await Document.find({ userId: req.user.id }).sort({ uploadDate: -1 });
+        res.json(documents);
+    } catch (error) {
+        console.error('Error fetching documents:', error);
+        res.status(500).json({ message: 'Server error fetching documents' });
+    }
+};
+
+exports.getDocumentById = async (req, res) => {
+    try {
+        const document = await Document.findById(req.params.id);
+
+        if (!document) {
+            return res.status(404).json({ message: 'Document not found' });
+        }
+
+        if (document.userId.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
+        const filePath = path.join(__dirname, '..', document.filePath); 
+        if (fs.existsSync(filePath)) {
+            res.sendFile(filePath);
+        } else {
+            res.status(404).json({ message: 'File not found on server storage' });
+        }
+    } catch (error) {
+        console.error('Error getting document by ID:', error);
+        res.status(500).json({ message: 'Server error getting document' });
+    }
+};

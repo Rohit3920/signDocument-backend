@@ -2,7 +2,9 @@ const User = require('../models/UserModel');
 const generateToken = require('../utils/generateToken');
 
 const registerUser = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { name, email, password } = req.body;
+    const username = name;
+    console.log(req.body)
 
     // Basic validation
     if (!username || !email || !password) {
@@ -27,9 +29,10 @@ const registerUser = async (req, res) => {
         });
 
         if (user) {
+            console.log(user)
             res.status(201).json({
                 _id: user._id,
-                username: user.username,
+                username: user.name,
                 email: user.email,
                 token: generateToken(user._id),
                 message: 'User registered successfully!'

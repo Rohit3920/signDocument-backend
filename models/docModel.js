@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const documentSchema = new mongoose.Schema({
+const DocumentSchema = new mongoose.Schema({
     fileName: {
         type: String,
         required: true,
@@ -23,6 +23,11 @@ const documentSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-});
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
+}, { timestamps: true });
 
-module.exports = mongoose.model('Document', documentSchema);
+module.exports = mongoose.model('Document', DocumentSchema);
