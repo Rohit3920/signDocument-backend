@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/UserModel'); 
+const User = require('../models/UserModel');
 
 module.exports = async (req, res, next) => {
     const token = req.header('x-auth-token');
@@ -9,9 +9,9 @@ module.exports = async (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); 
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-        req.user = decoded.user; 
+        req.user = decoded.user;
         next();
     } catch (err) {
         res.status(401).json({ message: 'Token is not valid' });

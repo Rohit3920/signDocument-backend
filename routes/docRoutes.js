@@ -4,12 +4,15 @@ const auth = require('../middleware/authMiddleware');
 const documentController = require('../controllers/docController');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = 'uploads/';
-        fs.mkdirSync(uploadPath, { recursive: true });
-        cb(null, uploadPath);
+        const uploadDir = 'uploads/';
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
         cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
@@ -29,7 +32,7 @@ const upload = multer({
 });
 
 router.post('/upload', auth, upload.single('document'), documentController.uploadDocument);
-router.get('/', auth, documentController.getDocuments);
-router.get('/:id', auth, documentController.getDocumentById);
+router.get('/', documentController.getDocuments);
+router.get('/:id', documentController.getDocumentById);
 
 module.exports = router;

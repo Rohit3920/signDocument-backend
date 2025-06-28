@@ -4,14 +4,12 @@ const fs = require('fs');
 
 exports.uploadDocument = async (req, res) => {
     if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });
+        return res.status(400).json({ message: 'No file uploaded. Please select a PDF file.' });
     }
-
-    console.log(req.user)
 
     try {
         const newDocument = new Document({
-            userId: req.user.id,
+            userId: req.body.user,
             fileName: req.file.originalname,
             filePath: req.file.path,
         });
@@ -20,13 +18,13 @@ exports.uploadDocument = async (req, res) => {
         res.status(201).json({ message: 'Document uploaded successfully', document: newDocument });
     } catch (error) {
         console.error('Error uploading document:', error);
-        res.status(500).json({ message: 'Server error during upload' });
+        res.status(500).json({ message: 'Server error during document upload.' });
     }
 };
 
 exports.getDocuments = async (req, res) => {
     try {
-        const documents = await Document.find({ userId: req.user.id }).sort({ uploadDate: -1 });
+        const documents = await Document.find().sort({ uploadDate: -1 });
         res.json(documents);
     } catch (error) {
         console.error('Error fetching documents:', error);
@@ -42,18 +40,18 @@ exports.getDocumentById = async (req, res) => {
             return res.status(404).json({ message: 'Document not found' });
         }
 
-        if (document.userId.toString() !== req.user.id) {
-            return res.status(403).json({ message: 'Access denied' });
-        }
-
-        const filePath = path.join(__dirname, '..', document.filePath); 
+        const filePath = path.join(__dirname, '..', document.filePath);
         if (fs.existsSync(filePath)) {
+            res.setHeader('Content-Type', document.mimetype || 'application/pdf');
             res.sendFile(filePath);
         } else {
             res.status(404).json({ message: 'File not found on server storage' });
         }
     } catch (error) {
         console.error('Error getting document by ID:', error);
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid document ID format.' });
+        }
         res.status(500).json({ message: 'Server error getting document' });
     }
 };
