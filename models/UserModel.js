@@ -21,7 +21,11 @@ const UserSchema = new mongoose.Schema(
             required: [true, "Please add a password"],
             minlength: [6, "Password must be at least 6 characters long"],
             select: false
-        }
+        },
+        registeredAt: {
+            type: Date,
+            default: Date.now,
+        },
     },
     { timestamps: true }
 );

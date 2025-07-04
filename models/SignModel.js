@@ -11,6 +11,10 @@ const SignatureSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    signValue: {
+        type: String,
+        required: true,
+    },
     x: {
         type: Number,
         required: true,
@@ -22,6 +26,10 @@ const SignatureSchema = new mongoose.Schema({
     page: {
         type: Number,
         required: true,
+    },
+    type: {
+        type: String,
+        default: 'signature',
     },
     status: {
         type: String,

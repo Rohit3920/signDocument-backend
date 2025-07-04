@@ -3,8 +3,10 @@ const router = express.Router();
 const auth = require('../middleware/authMiddleware');
 const signatureController = require('../controllers/signController');
 
-router.post('/', auth, signatureController.saveSignaturePosition);
+router.post('/',  signatureController.saveSignaturePosition);
 
-router.get('/:documentId', auth, signatureController.getSignaturesForDocument);
+router.get('/:documentId',signatureController.getSignaturesForDocument);
+
+router.post('/finalize-and-download/:documentId', signatureController.finalizeDocument);
 
 module.exports = router;
