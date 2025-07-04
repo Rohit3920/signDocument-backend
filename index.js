@@ -23,6 +23,7 @@ var corsOptions = {
 // Middleware
 app.use(express.json());
 app.use(cors(corsOptions));
+const http = require('http').Server(app);
 
 // Serve uploaded files statically
 // This makes files in the 'uploads' directory accessible via '/uploads' URL
