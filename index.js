@@ -15,7 +15,7 @@ require('./utils/dbConnect');
 
 //cors configuration
 var corsOptions = {
-    origin: "https://sign-document-backend.vercel.app/",
+    origin: process.env.FORNTEND_URL,
     methods: ["POST", "GET", "DELETE", "PUT"],
     Credential: true
 };
