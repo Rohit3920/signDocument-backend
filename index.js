@@ -13,9 +13,16 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB
 require('./utils/dbConnect');
 
+//cors configuration
+var corsOptions = {
+    origin: "https://sign-document-backend.vercel.app/",
+    methods: ["POST", "GET", "DELETE", "PUT"],
+    Credential: true
+};
+
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Serve uploaded files statically
 // This makes files in the 'uploads' directory accessible via '/uploads' URL
